@@ -17,10 +17,16 @@
 (defvar *default-listeners*)
 (defvar *default-listeners-by-channel*)
 
+;;; Modularization
 (defproto listener-bot ((proto 'sykobot))
   ((listeners (make-hash-table :test #'eq))
    (active-listeners nil)
    (deafp nil)))
+
+(defproto listener nil
+  ((name "Listeners")
+   (docstring "Listeners are my hook system, and are the root of all my behavior.")
+   (code (constantly nil))))
 
 (defreply msg-hook ((*bot* (proto 'listener-bot)) msg)
   (let ((*sender* (irc:source msg))

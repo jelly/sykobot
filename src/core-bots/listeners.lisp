@@ -26,7 +26,7 @@
 (defproto listener nil
   ((name "Listeners")
    (docstring "Listeners are my hook system, and are the root of all my behavior.")
-   (listener-fn (constantly nil))))
+   (code-fn (constantly nil))))
 
 ;;; Handling of listeners
 (defreply msg-hook ((*bot* (proto 'listener-bot)) msg)
@@ -44,7 +44,7 @@
 (defmessage set-listener (bot listener))
 (defmessage remove-listener (bot name))
 (defmessage listener-function (bot name))
-(defmessage call-listener (bot name))
+(defmessage call (bot name))
 
 (defreply set-listener ((bot (proto 'listener-bot)) (listener (proto 'listener)))
   (setf (gethash (name listener) (listeners bot)) listener))
@@ -52,27 +52,24 @@
 (defreply remove-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)))
   (remhash name (listeners bot)))
 
-(defreply listener-function ((bot (proto 'listener-bot)) (name (proto 'symbol)))
-  (with-properties (listeners) bot
-    (listener-fn
-     (gethash name listeners
-              (defclone ((proto 'listener))
-                  ((listener-fn
-                    (lambda ()
-                      (cerror "Continue" "Nonexistant listener ~S" name)))))))))
-(defreply listener-function (bot (listener (proto 'listener)))
+(defreply call-listener ((bot (proto 'listener-bot)) (listener (proto 'listener)))
   (declare (ignore bot))
-  (listener-fn listener))
-
-(defreply call-listener ((bot (proto 'listener-bot)) listener)
-  (funcall (listener-function bot listener)))
+  (funcall (code-fn listener)))
+(defreply call-listener ((bot (proto 'listener-bot)) (listener (proto 'symbol)))
+  (call-listener bot (gethash listener (listeners bot))))
 
 (defmacro deflistener (name &body body)
-  `(set-listener (proto 'listener-bot)
-                 (defclone ((proto 'listener))
-                     ((name ',name)
-                      (listener-fn
-                       (lambda () ,@body))))))
+  (let ((documentation nil))
+    (when (and (stringp (car body))
+               (cadr body))
+      (setf documentation (pop body)))
+    `(set-listener (proto 'listener-bot)
+                   (defclone ((proto 'listener))
+                       ((docstring
+                         ,(or documentation "This feature is undocumented."))
+                        (name ',name)
+                        (code-fn (lambda () ,@body)))
+                     (:nickname ',name)))))
 
 ;;; Customization of listeners
 (defmessage listener-on (bot channel name))

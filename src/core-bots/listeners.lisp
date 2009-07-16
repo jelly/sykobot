@@ -60,9 +60,11 @@
                   ((listener-fn
                     (lambda ()
                       (cerror "Continue" "Nonexistant listener ~S" name)))))))))
+(defreply listener-function (bot (listener (proto 'listener)))
+  (listener-fn listener))
 
-(defreply call-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)))
-  (funcall (listener-function bot name)))
+(defreply call-listener ((bot (proto 'listener-bot)) (listener (proto 'symbol)))
+  (funcall (listener-function bot listener)))
 
 (defmacro deflistener (name &body body)
   `(set-listener (proto 'listener-bot)
@@ -78,12 +80,14 @@
 (defmessage listener-active-p (bot channel name))
 
 (defreply listener-on ((bot (proto 'listener-bot)) channel name)
-  (pushnew name (alref channel (active-listeners bot))))
+  (pushnew (gethash name (listeners bot))
+           (alref channel (active-listeners bot))))
 
 (defreply listener-off ((bot (proto 'listener-bot)) channel name)
   (with-properties (active-listeners) bot
     (setf (alref channel active-listeners)
-          (delete name (alref channel active-listeners)))))
+          (delete (gethash name (listeners bot))
+                  (alref channel active-listeners)))))
 
 (defreply call-active-listeners ((bot (proto 'listener-bot)) channel)
   (let ((deafp (alref channel (deafp bot))))

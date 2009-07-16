@@ -43,7 +43,6 @@
 
 (defmessage set-listener (bot listener))
 (defmessage remove-listener (bot name))
-(defmessage listener-function (bot name))
 (defmessage call (bot name))
 
 (defreply set-listener ((bot (proto 'listener-bot)) (listener (proto 'listener)))
@@ -95,8 +94,10 @@
         (dolist (name (alref channel (active-listeners bot)))
           (call-listener bot name)))))
 
-(defreply listener-active-p ((bot (proto 'listener-bot)) channel name)
-  (member name (alref channel (active-listeners bot))))
+(defreply listener-active-p ((bot (proto 'listener-bot)) channel (listener (proto 'listener)))
+  (member listener (alref channel (active-listeners bot))))
+(defreply listener-active-p ((bot (proto 'listener-bot)) channel (name (proto 'symbol)))
+  (listener-active-p bot channel (gethash name (listeners bot))))
 
 (defun activate-listeners (bot channel &rest names)
   (dolist (name names)

@@ -41,15 +41,13 @@
       (error (e) (send-msg *bot* *channel*
                            (build-string "ERROR: ~A" e))))))
 
-(defmessage set-listener (bot name listener))
+(defmessage set-listener (bot listener))
 (defmessage remove-listener (bot name))
 (defmessage listener-function (bot name))
 (defmessage call-listener (bot name))
 
-(defreply set-listener ((bot (proto 'listener-bot))
-                        (name (proto 'symbol))
-                        (listener (proto 'listener)))
-  (setf (gethash name (listeners bot)) listener))
+(defreply set-listener ((bot (proto 'listener-bot)) (listener (proto 'listener)))
+  (setf (gethash (name listener) (listeners bot)) listener))
 
 (defreply remove-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)))
   (remhash name (listeners bot)))
@@ -67,7 +65,7 @@
   (funcall (listener-function bot name)))
 
 (defmacro deflistener (name &body body)
-  `(set-listener (proto 'listener-bot) ',name
+  `(set-listener (proto 'listener-bot)
                  (defclone ((proto 'listener))
                      ((name ',name)
                       (listener-fn

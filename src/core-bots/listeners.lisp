@@ -26,8 +26,9 @@
 (defproto listener nil
   ((name "Listeners")
    (docstring "Listeners are my hook system, and are the root of all my behavior.")
-   (code (constantly nil))))
+   (listener-fn (constantly nil))))
 
+;;; Handling of listeners
 (defreply msg-hook ((*bot* (proto 'listener-bot)) msg)
   (let ((*sender* (irc:source msg))
         (*channel* (let ((target (car (irc:arguments msg))))
@@ -40,29 +41,37 @@
       (error (e) (send-msg *bot* *channel*
                            (build-string "ERROR: ~A" e))))))
 
-(defmessage add-listener (bot name function))
+(defmessage set-listener (bot name listener))
 (defmessage remove-listener (bot name))
 (defmessage listener-function (bot name))
 (defmessage call-listener (bot name))
 
-(defreply set-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)) function)
-  (setf (gethash name (listeners bot)) function))
+(defreply set-listener ((bot (proto 'listener-bot))
+                        (name (proto 'symbol))
+                        (listener (proto 'listener)))
+  (setf (gethash name (listeners bot)) listener))
 
 (defreply remove-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)))
   (remhash name (listeners bot)))
 
 (defreply listener-function ((bot (proto 'listener-bot)) (name (proto 'symbol)))
   (with-properties (listeners) bot
-    (gethash name listeners
-             (lambda ()
-               (cerror "Continue" "Nonexistant listener ~S" name)))))
+    (listener-fn
+     (gethash name listeners
+              (defclone ((proto 'listener))
+                  ((listener-fn
+                    (lambda ()
+                      (cerror "Continue" "Nonexistant listener ~S" name)))))))))
 
 (defreply call-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)))
   (funcall (listener-function bot name)))
 
 (defmacro deflistener (name &body body)
   `(set-listener (proto 'listener-bot) ',name
-                 (lambda () ,@body)))
+                 (defclone ((proto 'listener))
+                     ((name ',name)
+                      (listener-fn
+                       (lambda () ,@body))))))
 
 ;;; Customization of listeners
 (defmessage listener-on (bot channel name))

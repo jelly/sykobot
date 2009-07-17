@@ -21,8 +21,11 @@
     (call-next-reply)))
 
 (defproto helpful nil
-  ((name "")
+  ((name "" :reader name)
    (docstring "There is no documentation here yet.")))
+
+(defreply (setf docstring) :after ((new-docstring (proto 'string)) (thing (proto 'helpful)))
+  (setf (stored-docstring (proto 'helpful-bot) (name thing)) new-docstring))
 
 (defreply init-sheep :after ((documented-sheep (proto 'helpful)) &key)
   (with-properties (name docstring) documented-sheep

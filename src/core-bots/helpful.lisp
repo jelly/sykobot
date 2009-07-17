@@ -28,6 +28,7 @@
   (setf (stored-docstring (proto 'helpful-bot) (name thing)) new-docstring))
 
 ;;; Why am I getting the properties of the parent sheep, rather than the new documented-sheep?
+;;; Answer: b/c sheeple is young and naive. MEHH!
 (defreply init-sheep :after ((documented-sheep (proto 'helpful)) &key)
   (print documented-sheep)
   (with-properties (name docstring) documented-sheep

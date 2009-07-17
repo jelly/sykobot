@@ -23,9 +23,9 @@
    (active-listeners nil)
    (deafp nil)))
 
-(defproto listener nil
-  ((name "Listeners")
-   (docstring "Listeners are my hook system, and are the root of all my behavior.")
+(defproto listener ((proto 'helpful))
+  ((name "Listener" :reader name)
+   (docstring "The listener system is like my backbone")
    (code-fn (constantly nil))))
 
 ;;; Handling of listeners
@@ -66,7 +66,7 @@
                    (defclone ((proto 'listener))
                        ((docstring
                          ,(or documentation "This feature is undocumented."))
-                        (name ',name)
+                        (name ,(symbol-name name))
                         (code-fn (lambda () ,@body)))
                      (:nickname ',name)))))
 

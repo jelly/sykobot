@@ -13,11 +13,11 @@
   (setf (gethash thing (docstrings bot)) new-docstring))
 
 (defreply (setf stored-docstring) :around ((new-docstring (proto 'string)) (bot (proto 'helpful-bot)) (thing (proto 'string)))
-  (declare (ignore new-docstring))
   (let ((old-docstring (stored-docstring bot thing)))
     (when old-docstring
-      (warn "Clobbering old docstring \"~A\" for thing: ~A"
-            old-docstring thing))
+      (warn "Clobbering old docstring \"~A\" for thing: ~A ~
+             with new docstring \"~A\""
+            old-docstring thing new-docstring))
     (call-next-reply)))
 
 (defproto helpful nil
@@ -27,6 +27,9 @@
 (defreply (setf docstring) :after ((new-docstring (proto 'string)) (thing (proto 'helpful)))
   (setf (stored-docstring (proto 'helpful-bot) (name thing)) new-docstring))
 
+;;; Why am I getting the properties of the parent sheep, rather than the new documented-sheep?
 (defreply init-sheep :after ((documented-sheep (proto 'helpful)) &key)
+  (print documented-sheep)
   (with-properties (name docstring) documented-sheep
+    (print (list name docstring))
     (setf (stored-docstring (proto 'helpful-bot) name) docstring)))

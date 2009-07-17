@@ -28,6 +28,7 @@
                       :serial t
                       :components
                       ((:file "sykobot")
+                       (:file "helpful")
                        (:file "listeners")
                        (:file "commands")))
              (:module "etc-bots"

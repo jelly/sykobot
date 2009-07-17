@@ -18,7 +18,7 @@
 (defvar *default-listeners-by-channel*)
 
 ;;; Modularization
-(defproto listener-bot ((proto 'sykobot))
+(defproto listener-bot ((proto 'helpful-bot))
   ((listeners (make-hash-table :test #'eq))
    (active-listeners nil)
    (deafp nil)))

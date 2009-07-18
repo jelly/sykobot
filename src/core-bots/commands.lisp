@@ -353,21 +353,22 @@ utf-8 code."
   (when (null zone-string) (setf zone-string "0"))
   (let ((zone (parse-integer zone-string :junk-allowed t)))
     (if zone
-        (build-string "The time is ~A." (get-ks-timestamp :zone zone))
+        (build-string "The time is ~A." (get-kilosecond-timestamp (get-universal-time) zone))
         "Invalid timezone.")))
 
 ;;; Parrot
 (deflistener parrot
   (send-msg *bot* *channel* *message*))
+;; I'm semi-disabling parrot for now. -- sykopomp
 (defcommand parrot ()
   "Syntax: 'parrot' - Turns the bot into an auto-echoing douchebag."
   (if (listener-active-p *bot* *channel* 'parrot)
       (progn
-        (listener-off *bot* *channel* 'parrot)
+        #+nil(listener-off *bot* *channel* 'parrot)
         "NODOUCHE")
       (progn
-        (listener-on *bot* *channel* 'parrot)
-        "TIME TO BE A DOUCHEBAG")))
+	#+nil (listener-on *bot* *channel* 'parrot)
+	"No. Fuck you. Go away.")))
 (defcommand noparrot ()
   "Syntax: 'noparrot' - stops the madness."
   (listener-off *bot* *channel* 'parrot)
@@ -436,6 +437,9 @@ I love to singa"
 (defcommand translate ("(\\S+) (\\S+) (.*)" input-lang output-lang text)
   "Syntax: 'translate <input-lang> <output-lang> <text>' - translates TEXT from input-lang into~
  output-lang. Providing '*' as the input-lang will make it auto-detect the from-language."
+  (translate input-lang output-lang text))
+ 
+(defun translate (input-lang output-lang text)
   (if (and (= (length output-lang) 2)
            (or (= (length input-lang) 2)
                (string= input-lang "*")))

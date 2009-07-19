@@ -21,19 +21,6 @@
 
 (defvar *active-bot* nil)
 
-;;; Stdout logging of raw IRC.
-(defmethod cl-irc:irc-message-event :before (connection message)
-  (declare (ignore connection))
-  (format t "-> ~a~%"
-          (let ((message (irc:raw-message-string message)))
-            (subseq message 0 (1- (length message))))))
-
-(defmethod cl-irc::send-irc-message :before (connection command &rest arguments)
-  (declare (ignore connection))
-  ;; make-irc-message includes a newline
-  (format t "<- ~a"  (apply #'cl-irc::make-irc-message command arguments))
-  (finish-output))
-
 ;;;
 ;;; IRC connection
 ;;;

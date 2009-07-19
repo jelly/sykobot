@@ -19,7 +19,7 @@
 
 ;;; Modularization
 (defproto listener-bot ((proto 'helpful-bot))
-  ((listeners (make-hash-table :test #'eq))
+  ((listeners (make-hash-table :test #'equalp))
    (active-listeners nil)
    (deafp nil)))
 
@@ -79,14 +79,14 @@
 (defreply listener-on ((bot (proto 'listener-bot)) channel (listener (proto 'listener)))
   (pushnew listener (alref channel (active-listeners bot))))
 (defreply listener-on ((bot (proto 'listener-bot)) channel (name (proto 'symbol)))
-  (let ((listener (gethash name (listeners bot))))
+  (let ((listener (gethash (symbol-name name) (listeners bot))))
     (when listener (listener-on bot channel listener))))
 
 (defreply listener-off ((bot (proto 'listener-bot)) channel (listener (proto 'listener)))
   (setf (alref channel (active-listeners bot))
         (delete listener (alref channel (active-listeners bot)))))
 (defreply listener-off ((bot (proto 'listener-bot)) channel (name (proto 'symbol)))
-  (let ((listener (gethash name (listeners bot))))
+  (let ((listener (gethash (symbol-name name) (listeners bot))))
     (when listener (listener-off bot channel listener))))
 
 (defreply call-active-listeners ((bot (proto 'listener-bot)) channel)

@@ -86,7 +86,8 @@
   (setf (alref channel (active-listeners bot))
         (delete listener (alref channel (active-listeners bot)))))
 (defreply listener-off ((bot (proto 'listener-bot)) channel (name (proto 'symbol)))
-  (listener-off bot channel (gethash name (listeners bot))))
+  (let ((listener (gethash name (listeners bot))))
+    (when listener (listener-off bot channel listener))))
 
 (defreply call-active-listeners ((bot (proto 'listener-bot)) channel)
   (let ((deafp (alref channel (deafp bot))))

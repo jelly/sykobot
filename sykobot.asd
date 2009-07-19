@@ -30,7 +30,8 @@
                       ((:file "sykobot")
                        (:file "helpful")
                        (:file "listeners")
-                       (:file "commands")))
+                       (:file "commands")
+                       (:file "core-crap")))
              (:module "etc-bots"
                       :serial t
                       :components

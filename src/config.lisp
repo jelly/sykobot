@@ -26,7 +26,7 @@
 (defvar *home* (merge-pathnames ".sykobot/" (user-homedir-pathname)))
 
 (defmessage bot-dir (bot))
-(defreply bot-dir ((bot (proto 'sykobot)))
+(defreply bot-dir ((bot (proto 'irc-bot)))
   (ensure-directories-exist (merge-pathnames (dir bot) *home*)))
 
 (defun run-bot (&optional (bot-prototype (clone (proto 'quotes-bot) 

@@ -17,11 +17,18 @@
 (defvar *default-listeners*)
 (defvar *default-listeners-by-channel*)
 
-(defproto listener-bot ((proto 'sykobot))
-  ((listeners (make-hash-table :test #'eq))
+;;; Modularization
+(defproto listener-bot ((proto 'helpful-bot))
+  ((listeners (make-hash-table :test #'equalp))
    (active-listeners nil)
    (deafp nil)))
 
+(defproto listener ((proto 'helpful))
+  ((name "Listener" :reader name)
+   (docstring "The listener system is like my backbone")
+   (code-fn (constantly nil))))
+
+;;; Handling of listeners
 (defreply msg-hook ((*bot* (proto 'listener-bot)) msg)
   (let ((*sender* (irc:source msg))
         (*channel* (let ((target (car (irc:arguments msg))))
@@ -34,29 +41,34 @@
       (error (e) (send-msg *bot* *channel*
                            (build-string "ERROR: ~A" e))))))
 
-(defmessage add-listener (bot name function))
+(defmessage set-listener (bot listener))
 (defmessage remove-listener (bot name))
-(defmessage listener-function (bot name))
-(defmessage call-listener (bot name))
+(defmessage call (bot name))
 
-(defreply set-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)) function)
-  (setf (gethash name (listeners bot)) function))
+(defreply set-listener ((bot (proto 'listener-bot)) (listener (proto 'listener)))
+  (setf (gethash (name listener) (listeners bot)) listener))
 
 (defreply remove-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)))
   (remhash name (listeners bot)))
 
-(defreply listener-function ((bot (proto 'listener-bot)) (name (proto 'symbol)))
-  (with-properties (listeners) bot
-    (gethash name listeners
-             (lambda ()
-               (cerror "Continue" "Nonexistant listener ~S" name)))))
-
-(defreply call-listener ((bot (proto 'listener-bot)) (name (proto 'symbol)))
-  (funcall (listener-function bot name)))
+(defreply call-listener ((bot (proto 'listener-bot)) (listener (proto 'listener)))
+  (declare (ignore bot))
+  (funcall (code-fn listener)))
+(defreply call-listener ((bot (proto 'listener-bot)) (listener (proto 'symbol)))
+  (call-listener bot (gethash listener (listeners bot))))
 
 (defmacro deflistener (name &body body)
-  `(set-listener (proto 'listener-bot) ',name
-                 (lambda () ,@body)))
+  (let ((documentation nil))
+    (when (and (stringp (car body))
+               (cadr body))
+      (setf documentation (pop body)))
+    `(set-listener (proto 'listener-bot)
+                   (defclone ((proto 'listener))
+                       ((docstring
+                         ,(or documentation "This feature is undocumented."))
+                        (name ,(symbol-name name))
+                        (code-fn (lambda () ,@body)))
+                     (:nickname ',name)))))
 
 ;;; Customization of listeners
 (defmessage listener-on (bot channel name))
@@ -64,13 +76,18 @@
 (defmessage call-active-listeners (bot channel))
 (defmessage listener-active-p (bot channel name))
 
-(defreply listener-on ((bot (proto 'listener-bot)) channel name)
-  (pushnew name (alref channel (active-listeners bot))))
+(defreply listener-on ((bot (proto 'listener-bot)) channel (listener (proto 'listener)))
+  (pushnew listener (alref channel (active-listeners bot))))
+(defreply listener-on ((bot (proto 'listener-bot)) channel (name (proto 'symbol)))
+  (let ((listener (gethash (symbol-name name) (listeners bot))))
+    (when listener (listener-on bot channel listener))))
 
-(defreply listener-off ((bot (proto 'listener-bot)) channel name)
-  (with-properties (active-listeners) bot
-    (setf (alref channel active-listeners)
-          (delete name (alref channel active-listeners)))))
+(defreply listener-off ((bot (proto 'listener-bot)) channel (listener (proto 'listener)))
+  (setf (alref channel (active-listeners bot))
+        (delete listener (alref channel (active-listeners bot)))))
+(defreply listener-off ((bot (proto 'listener-bot)) channel (name (proto 'symbol)))
+  (let ((listener (gethash (symbol-name name) (listeners bot))))
+    (when listener (listener-off bot channel listener))))
 
 (defreply call-active-listeners ((bot (proto 'listener-bot)) channel)
   (let ((deafp (alref channel (deafp bot))))
@@ -79,8 +96,10 @@
         (dolist (name (alref channel (active-listeners bot)))
           (call-listener bot name)))))
 
-(defreply listener-active-p ((bot (proto 'listener-bot)) channel name)
-  (member name (alref channel (active-listeners bot))))
+(defreply listener-active-p ((bot (proto 'listener-bot)) channel (listener (proto 'listener)))
+  (member listener (alref channel (active-listeners bot))))
+(defreply listener-active-p ((bot (proto 'listener-bot)) channel (name (proto 'symbol)))
+  (listener-active-p bot channel (gethash name (listeners bot))))
 
 (defun activate-listeners (bot channel &rest names)
   (dolist (name names)

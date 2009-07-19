@@ -1,3 +1,10 @@
+;;;; Copyright 2009 Josh Marchan
+;;;;
+;;;; This file is part of sykobot.
+;;;;
+;;;; For licensing and warranty information, refer to COPYING
+;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defpackage #:sykobot
   (:use :cl :cl-ppcre :sheeple :alref)
   (:export :sykobot :run-bot :connect :disconnect :join :part

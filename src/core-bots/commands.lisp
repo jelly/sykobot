@@ -98,7 +98,7 @@
 (defmessage get-message-index (bot message)
   (:documentation "Checks if a message is applicable for the bot. If so,
 it returns the command section of the message."))
-(defreply get-message-index ((bot (proto 'sykobot)) message)
+(defreply get-message-index ((bot (proto 'irc-bot)) message)
   (nth-value 1 (scan (detection-regex bot) message)))
 
 (deflistener command-listener
@@ -112,7 +112,7 @@ it returns the command section of the message."))
 (defmessage get-responses (bot cmd args sender channel))
 (defmessage process-command-string (bot string sender channel &optional pipe-input))
 
-(defreply respond-to-message ((bot (proto 'sykobot))
+(defreply respond-to-message ((bot (proto 'irc-bot))
                               (sender (proto 'string))
                               (channel (proto 'string))
                               (message (proto 'string)))
@@ -121,4 +121,4 @@ splits it into a command and arguments"
   (destructuring-bind (command &optional *message*)
       (split "\\s+" message :limit 2)
     (send-reply bot channel sender
-                (funcall (command-function bot command))))
+                (funcall (command-function bot command)))))

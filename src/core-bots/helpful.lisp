@@ -1,6 +1,6 @@
 (in-package :sykobot)
 
-(defproto helpful-bot ((proto 'sykobot))
+(defproto helpful-bot ((proto 'irc-bot))
   ((docstrings (make-hash-table :test #'equalp))))
 
 (defmessage stored-docstring (bot thing))

@@ -79,7 +79,8 @@
 (defreply listener-on ((bot (proto 'listener-bot)) channel (listener (proto 'listener)))
   (pushnew listener (alref channel (active-listeners bot))))
 (defreply listener-on ((bot (proto 'listener-bot)) channel (name (proto 'symbol)))
-  (listener-on bot channel (gethash name (listeners bot))))
+  (let ((listener (gethash name (listeners bot))))
+    (when listener (listener-on bot channel listener))))
 
 (defreply listener-off ((bot (proto 'listener-bot)) channel (listener (proto 'listener)))
   (setf (alref channel (active-listeners bot))

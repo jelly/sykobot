@@ -177,18 +177,6 @@ splits it into a command and arguments"
 (defcommand echo ("(.*)" string)
   "Syntax: 'echo <string>' - Echoes back STRING."
   string)
-(defcommand slap ("(\\S+)" nick)
-  "Syntax: 'slap <nick>' - Slaps nick with something."
-  (build-string "slaps " nick " with"
-                      (random-elt '(" a man page"
-				    " the linux kernel"
-				    " a segfault"
-				    " windows XP"
-				    " windows Vista"
-				    " Stallman"
-				    " Bill Gates"
-                                    " your mom"))))	       
-
 (defcommand reverse ("(.*)" input)
   "Syntax: 'reverse <string>' - Reverses the input."
   (reverse input))

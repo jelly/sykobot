@@ -1,3 +1,10 @@
+;;;; Copyright 2009 Josh Marchan
+;;;;
+;;;; This file is part of sykobot.
+;;;;
+;;;; For licensing and warranty information, refer to COPYING
+;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :sykobot)
 
 (defproto interpreter-bot ((proto 'command-bot))

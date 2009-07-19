@@ -1,3 +1,11 @@
+;;;; Copyright 2009 Josh Marchan
+;;;;
+;;;; This file is part of sykobot.
+;;;;
+;;;; For licensing and warranty information, refer to COPYING
+;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;; Unit tests for src/utils/time-utils.lisp
 (in-package :sykobot)
 

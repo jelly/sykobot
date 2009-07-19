@@ -1,3 +1,11 @@
+;;;; Copyright 2009 Josh Marchan
+;;;;
+;;;; This file is part of sykobot.
+;;;;
+;;;; For licensing and warranty information, refer to COPYING
+;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;; Hacks go here. If appropriate, they should be sent to their project maintainers
 ;;;; once tested. This file is loaded before any other sykobot files, including utils.lisp
 ;;;; Please document why the hack is necessary, and make the librar(y|ies) it affects obvious.

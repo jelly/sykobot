@@ -59,7 +59,7 @@ Notes
 -----
 
 Sykobot is still in development, although it already has quite a few features. Sykopomp's
-master branch on github has the latest tagged release, although you can pull from the devel
+master branch on github has the latest tagged release ( [0.1 Hello Kitty][8], although you can pull from the devel
 branch for the Bleeding Edge Experience. We promise, it'll make more than just your edge bleed.
 
 
@@ -76,6 +76,7 @@ Sykobot has quite a few modules already, including:
 * ELIZA -- a full-fledged simple ELIZA implementation, so you can chat away with your new friend.
 * Karma -- Who's been naughty? Who's been nice? The karma system is weighted.
 * Seen -- That command that's been on minion's TODO list since the dawn of time.
+* Now Playing -- a simple listener that reacts to a "np: " in a funny way.
 * And more...
 
 Using Sykobot
@@ -101,6 +102,30 @@ On Clozure CL:
 
 	(trace (:package sykobot))
 
+Code Example
+------------
+
+For coders here is an simple example of an bot command and a listener.
+
+so here is an echo example, the echo command simply returns what the user typed after 'echo'.
+
+First we define the command with "defcommand" <command> , then we specify if the command takes an argument with regex. The text after echo ( or the command ) is stored in the var 'string'. On the second line is the error handling specified when the user doesnt call echo with arguments it will show the syntax message.The last line is the return wich must be a string.
+	(defcommand echo ("(.*)" string)
+  	"Syntax: 'echo <string>' - Echoes back STRING."
+  	string)
+
+Now we are going to make an easy listener that reacts on 'np: Metallica - Nothing Else Matters'. First specify that the .lisp file is part of the sykobot package ( first line ). On the second line we specify the listener with 'deflistener' , then with when we check for an certain event, when that event occurs we reply the sender with an message that is randomly taken from the list. 
+
+	(in-package :sykobot)
+	(deflistener scan-for-now-playing
+  		(when (and (> (length *message*) 3)
+             		(STRING-equal (subseq *message* 0 3) "np:"))
+    		(send-reply *bot* *channel* *sender*
+                	(random-elt '("Nice song, man!"
+                              "You know your classics!")))))
+
+
+
 [1]: http://www.sbcl.org/
 [2]: http://trac.clozure.com/openmcl
 [3]: http://www.franz.com/products/allegrocl/
@@ -108,3 +133,4 @@ On Clozure CL:
 [5]: http://common-lisp.net/project/clbuild/
 [6]: http://bavardage.github.com/Kiloseconds
 [7]: http://github.com/sykopomp/sykobot/issues
+[8]: http://github.com/sykopomp/sykobot/commit/d1ca39bb1e29421c9c9904f7cdde8c10c8c2f028

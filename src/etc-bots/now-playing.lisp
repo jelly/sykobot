@@ -7,7 +7,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :sykobot)
 
-;;; IDEA: add last.fm recomendation!
 (deflistener scan-for-now-playing
   (when (and (> (length *message*) 3)
              (STRING-equal (subseq *message* 0 3) "np:"))

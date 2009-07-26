@@ -44,6 +44,7 @@
     listen for stuff like nick++ or nick ftw
 *** TODO Abuse
     Prevent it somehow. Have a system for ignoring user input for certain listeners/commands.
+    If a users gives 5 invalid commands , 5 times the same commands ignore him for 5 minutes.
 *** TODO Google fight
 *** TODO !oh noes, !/dev/null commands which use/abuse random users
 *** TODO !fight weechat irssi 
@@ -99,4 +100,4 @@
     tagging this as tentatively done.
 ** !fight weechat irssi 
 ** !oh noes , !/dev/null commands wich use/abuse random users
-** Slap command , needs to use a seperate file for slap items
+** DONE [#C]  Slap command , needs to use a seperate file for slap items
